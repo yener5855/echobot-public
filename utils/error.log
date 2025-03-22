@@ -1,0 +1,34 @@
+[2025-03-16T00:36:49.736Z] Error: console[level] is not a function
+Stack trace: TypeError: console[level] is not a function
+    at ErrorHandler.logError (/home/echo-bot/utils/errorHandler.js:18:23)
+    at ErrorHandler.handleError (/home/echo-bot/utils/errorHandler.js:31:14)
+    at ErrorHandler.throwError (/home/echo-bot/utils/errorHandler.js:49:14)
+    at Object.<anonymous> (/home/echo-bot/index.js:242:18)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Object.<anonymous> (/usr/local/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+    at node:internal/main/run_main_module:28:49
+[2025-03-16T00:36:49.738Z] Error: console[level] is not a function
+Stack trace: TypeError: console[level] is not a function
+    at ErrorHandler.logError (/home/echo-bot/utils/errorHandler.js:18:23)
+    at ErrorHandler.handleError (/home/echo-bot/utils/errorHandler.js:31:14)
+    at ErrorHandler.throwError (/home/echo-bot/utils/errorHandler.js:49:14)
+    at Object.<anonymous> (/home/echo-bot/index.js:276:22)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Object.<anonymous> (/usr/local/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23)
+    at Module._compile (node:internal/modules/cjs/loader:1364:14)
+    at Module._extensions..js (node:internal/modules/cjs/loader:1422:10)
+    at Module.load (node:internal/modules/cjs/loader:1203:32)
+    at Module._load (node:internal/modules/cjs/loader:1019:12)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:128:12)
+    at node:internal/main/run_main_module:28:49

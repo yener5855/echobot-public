@@ -1,0 +1,87 @@
+{
+    "token": "",
+    "prefix": "+",
+    "twitchClientId": "your-twitch-client-id",
+    "twitchAccessToken": "your-twitch-access-token",
+    "debug": true,
+    "ownerIDS": [
+       "809533218205466674",
+       "733704849623089183"
+    ],
+    "fnbr": "14fdbecb-9fa1-46f3-960f-99ada6866b04",
+    "fortnitetracker": "d54f8936-5737-42ee-a362-143ad2d78169",
+    "memer_api": "xxx",
+    "status": {
+        "text": "{prefix}help | on {guildcount} Servers, with {membercount} Members | Played: {songsplayed} Songs",
+        "text2": "echo community",
+        "type": "PLAYING",
+        "url": "https://twitch.tv/yener5855"
+    },
+    "clientsettings": {
+       "nodes": [
+          {
+             "host": "dono-01.danbot.host",
+             "port": 1626,
+             "password": "yener58555"
+          },
+          {
+             "host": "lava-v3.ajieblogs.eu.org",
+             "port": 80,
+             "password": "https://dsc.gg/ajidevserver"
+          },
+          {
+             "host": "dono-01.danbot.host",
+             "port": 1646,
+             "password": "yener58555"
+          }
+       ]
+    },
+    "spotify": {
+       "clientSecret": "053469ffeb3844079fab734ebf3090c2",
+       "clientID": "bf5ee2a72bae40ffadc71a47280e5ff9"
+    },
+    "settings": {
+       "COMMENT": "time_delay 0 === insta leave",
+       "leaveOnEmpty_Channel": {
+          "enabled": true,
+          "time_delay": 30000
+       },
+       "LeaveOnEmpty_Queue": {
+          "enabled": true,
+          "time_delay": 30000
+       },
+       "selfDeaf": true
+    },
+    "lyricssettings": {
+       "lyrics_finder": true,
+       "ksoft_api": {
+          "use_this_instead": true,
+          "api_key": ""
+       }
+    },
+    "weather_api": {
+       "api_key": ""
+    },
+    "gemmi_api": {
+        "api_key": ""
+     },
+    "modmailChannelId": "YOUR_MODMAIL_CHANNEL_ID",
+    "logWebhookURL": "",
+    "security": {
+        "channelCreate": false,
+        "channelDelete": false,
+        "channelUpdate": false,
+        "roleCreate": false,
+        "roleDelete": false,
+        "roleUpdate": false,
+        "botAdd": false,
+        "memberUpdate": false,
+        "memberBan": false,
+        "memberKick": false,
+        "messageDelete": false,
+        "webhookUpdate": false,
+        "vanityUrlDelete": false,
+        "messageSpam": false
+    },
+    "groq_api_key": "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"
+}
