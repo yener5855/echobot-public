@@ -1,19 +1,37 @@
-const Discord = require('discord.js');
+const { MessageEmbed } = require("discord.js");
+const axios = require("axios");
 
-module.exports = async (client, interaction, args) => {
-    const msg = interaction.options.getString('text');
+module.exports = {
+  name: "gif",
+  description: "Fetch a random GIF",
+  category: "🕹️ Fun",
+  run: async (client, message) => {
+    try {
+      const response = await axios.get("https://api.giphy.com/v1/gifs/random", {
+        params: { api_key: "YOUR_GIPHY_API_KEY" },
+      });
+      const { title, images } = response.data.data;
 
-    if (!msg) return client.errUsage({ usage: "gif [text]", type: 'editreply' }, interaction);
-if(!process.env.GIPHY_TOKEN) process.env.GIPHY_TOKEN = "fVOXbfcBdwPBcdbkW8fXWpovxitLDb4K";
-    var giphy = require('giphy-api')(process.env.GIPHY_TOKEN);
+      return message.reply({
+        embeds: [
+          new MessageEmbed()
+            .setColor("RANDOM")
+            .setTitle(title || "Random GIF")
+            .setImage(images.original.url)
+            .setFooter("Powered by Giphy"),
+        ],
+      });
+    } catch (error) {
+      console.error(error);
+      return message.reply({
+        embeds: [
+          new MessageEmbed()
+            .setColor("RED")
+            .setTitle("❌ Failed to fetch a GIF!")
+            .setFooter("Please try again later."),
+        ],
+      });
+    }
+  },
+};
 
-    giphy.random(msg, function (err, res) {
-        client.embed({
-            title: `📺・${msg} Gif`,
-            image: `https://media1.giphy.com/media/${res.data.id}/giphy.gif`,
-            type: 'editreply'
-        }, interaction);
-    });
-}
-
- 

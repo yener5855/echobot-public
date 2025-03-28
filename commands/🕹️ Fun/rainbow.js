@@ -53,7 +53,7 @@ module.exports = {
       let attachment = await new MessageAttachment(image, "rainbow.png");
 
       message.reply({embeds : [new MessageEmbed()
-          .setColor(es.color)
+          .setColor(/^#([0-9A-F]{3}){1,2}$/i.test(es.color) ? es.color : "RED") // Validate color
           .setFooter(client.getFooter(es))
           .setImage("attachment://rainbow.png")
       ], files : [attachment]}).catch(() => {})

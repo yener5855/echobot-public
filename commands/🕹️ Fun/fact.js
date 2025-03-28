@@ -1,22 +1,27 @@
-const Discord = require('discord.js');
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const { MessageEmbed } = require("discord.js");
+const axios = require("axios");
 
-module.exports = async (client, interaction, args) => {
+module.exports = {
+  name: "fact",
+  description: "Get a random fact",
+  category: "🕹️ Fun",
+  run: async (client, message) => {
+    try {
+      const response = await axios.get("https://uselessfacts.jsph.pl/random.json?language=en");
+      const { text: fact } = response.data;
 
-    var url = 'https://uselessfacts.jsph.pl/random.json?language=en'
-
-
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            fact = data.text;
-
-            client.embed({
-                title: `😂・Fact`,
-                desc: fact,
-                type: 'editreply',
-            }, interaction);
-        })
-        .catch(err => console.error(err));
-}
+      return message.reply({
+        embeds: [
+          new MessageEmbed()
+            .setColor("RANDOM")
+            .setTitle("💡 Random Fact")
+            .setDescription(fact),
+        ],
+      });
+    } catch (error) {
+      console.error(error);
+      return message.reply("❌ Failed to fetch a fact. Please try again later.");
+    }
+  },
+};
 

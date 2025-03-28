@@ -462,37 +462,34 @@ module.exports = (c) => {
     });
 }
 
+const loggerQueue = new Map(); // Ensure a queue per channel
+
 async function send_log(c, guild, color, title, description, thumb, fieldt, fieldv, fieldt2, fieldv2) {
-    try {
-        if (!guild || guild?.available == false) return console.log("NO GUILD");
-        //CREATE THE EMBED
-        const LogEmbed = new Discord.MessageEmbed()
-            .setColor(color ? color : "BLACK")
-            .setDescription(description ? description.substring(0, 2048) : "\u200b")
-            .setTitle(title ? title.substring(0, 256) : "\u200b")
-            .setTimestamp()
-            .setThumbnail(thumb ? thumb : guild?.iconURL({
-                format: "png"
-            }))
-            .setFooter(c.getFooter(guild?.name + " | powered by: https://yener5855.is-local.org/", guild?.iconURL({
-                format: "png"
-            })))
-        if (fieldt && fieldv) {
-            if (fieldv.trim() !== ">>>") {
-                LogEmbed.addField(fieldt.substring(0, 256), fieldv.substring(0, 1024))
-            }
-        }
-        if (fieldt2 && fieldv2) {
-            if (fieldv2.trim() !== ">>>") {
-                LogEmbed.addField(fieldt2.substring(0, 256), fieldv2.substring(0, 1024))
-            }
-        }
-        //GET THE CHANNEL
-        let loggersettings = c.settings.get(guild.id, "logger")
-        if (!loggersettings || loggersettings.channel === "no") return;
-        const logger = await c.channels.fetch(loggersettings.channel).catch(() => {});
-        if (!logger) throw new SyntaxError("CHANNEL NOT FOUND")
-        return logger.send({ embeds: [LogEmbed] }).catch(() => {})
-    } catch (e) {
+    const channelId = guild.settings.get("logger.channel");
+    if (!channelId) return;
+
+    const queue = loggerQueue.get(channelId) || [];
+    queue.push({ color, title, description, thumb, fieldt, fieldv, fieldt2, fieldv2 });
+    loggerQueue.set(channelId, queue);
+
+    if (queue.length === 1) {
+        processLoggerQueue(channelId);
+    }
+}
+
+async function processLoggerQueue(channelId) {
+    const queue = loggerQueue.get(channelId);
+    if (!queue || queue.length === 0) return;
+
+    const log = queue.shift();
+    const channel = client.channels.cache.get(channelId);
+    if (channel) {
+        await channel.send({ embeds: [new MessageEmbed(log)] }).catch(console.error);
+    }
+
+    if (queue.length > 0) {
+        setTimeout(() => processLoggerQueue(channelId), Math.min(15000, Math.max(2000, 500)));
+    } else {
+        loggerQueue.delete(channelId);
     }
 }

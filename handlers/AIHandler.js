@@ -1,3 +1,5 @@
+const { MessageEmbed } = require('discord.js');
+
 class AIHandler {
     constructor(client) {
         this.client = client;
@@ -10,18 +12,27 @@ class AIHandler {
     handleCommand(command, message) {
         if (command === 'askAI') {
             const input = message.content.replace(/^!askAI\s*/, ""); // Remove command prefix
+            const startTime = Date.now();
             this.generateResponse(input).then(response => {
                 message.channel.send(response);
             }).catch(error => {
                 console.error("Error handling command:", error);
-                message.channel.send("An error occurred while processing your request.");
+                message.channel.send({
+                    embeds: [new MessageEmbed()
+                        .setColor("RED")
+                        .setTitle("Error")
+                        .setDescription("An error occurred while processing your request. Please try again later.")
+                        .addField("Response Time", `Generated the Content\nTook: ${Date.now() - startTime}ms`)
+                        .setFooter(`Requested by ${message.author.tag}`, message.author.displayAvatarURL({ dynamic: true }))
+                    ]
+                });
             });
         }
     }
 
     async generateResponse(input, options = {}) {
         const {
-            model = "deepseek-r1-distill-qwen-32b",
+            model = "llama-3.2-3b-preview",
             temperature = 1,
             maxCompletionTokens = 1024,
             topP = 1,
@@ -51,6 +62,16 @@ class AIHandler {
 
             if (!response.ok) {
                 console.error(`GROQ_API returned an error: ${response.status} ${response.statusText}`);
+                const startTime = Date.now();
+                message.channel.send({
+                    embeds: [new MessageEmbed()
+                        .setColor("RED")
+                        .setTitle("API Error")
+                        .setDescription(`The API returned an error: ${response.statusText}`)
+                        .addField("Response Time", `Generated the Content\nTook: ${Date.now() - startTime}ms`)
+                        .setFooter(`Requested by ${message.author.tag}`, message.author.displayAvatarURL({ dynamic: true }))
+                    ]
+                });
                 return `Error: ${response.statusText}`;
             }
 

@@ -248,10 +248,11 @@ module.exports = (client) => {
                     .setFooter(client.getFooter(`💢 Action by: ${member.user.tag}`, member.user.displayAvatarURL({dynamic: true})))]
                   })
                 }
-                var data = generateQueueEmbed(client, player, track)
+                // Ensure the button state updates correctly
+                const data = generateQueueEmbed(client, player, track);
                 swapmsg.edit(data).catch((e) => {
-                  //console.log(e.stack ? String(e.stack).grey : String(e).grey)
-                })
+                  console.log(e.stack ? String(e.stack).grey : String(e).grey);
+                });
               }
 
 

@@ -54,7 +54,7 @@ module.exports = {
 
       message.reply({embeds :[tempmsg.embeds[0]
         .setAuthor(`Meme for: ${user.tag}`, avatar)
-        .setColor(es.color)
+        .setColor(/^#([0-9A-F]{3}){1,2}$/i.test(es.color) ? es.color : "RED") // Validate color
         .setImage("attachment://wasted.png")
       ], files : [attachment]}).catch(() => {})
         .then(msg => tempmsg.delete().catch(() => {}))

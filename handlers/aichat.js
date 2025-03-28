@@ -25,7 +25,8 @@ module.exports = client => {
 
                 try {
                     const apiKey = process.env.GROQ_API_KEY || config.groq_api_key;
-                    const response = await fetch(`https://api.groq.com/openai/v1/chat/completions`, { // Corrected URL
+                    const startTime = Date.now(); // Start timing the response
+                    const response = await fetch(`https://api.groq.com/openai/v1/chat/completions`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -33,7 +34,7 @@ module.exports = client => {
                         },
                         body: JSON.stringify({
                             messages: [{ role: "user", content: message.content }],
-                            model: "deepseek-r1-distill-qwen-32b",
+                            model: "llama-3.2-3b-preview",
                             temperature: 1,
                             max_completion_tokens: 1024,
                             top_p: 1,
@@ -69,12 +70,21 @@ module.exports = client => {
                         }
                     }
 
+                    const endTime = Date.now(); // End timing the response
+                    const responseTime = endTime - startTime;
+
                     console.log("Final GROQ_API Response:", result); // Debugging log
                     if (!result.trim()) {
                         return message.channel.send({ content: "No meaningful response received from GROQ_API." }).catch(() => {});
                     }
 
-                    message.channel.send({ content: result }).catch(() => {});
+                    const embed = new MessageEmbed()
+                        .setColor("#0099ff")
+                        .setTitle("AI Response")
+                        .setDescription(result)
+                        .setFooter(`Model: llama-3.2-3b-preview | Response Time: ${responseTime}ms`);
+
+                    message.channel.send({ embeds: [embed] }).catch(() => {});
                 } catch (e) {
                     console.error("Error contacting GROQ_API:", e);
                     message.channel.send({ content: "<:no:833101993668771842> GROQ_API is down." }).catch(() => {});

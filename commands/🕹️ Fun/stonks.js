@@ -1,5 +1,5 @@
 ﻿const Discord = require("discord.js");
-const {MessageEmbed, MessageAttachment} = require("discord.js");
+const { MessageEmbed, MessageAttachment } = require("discord.js");
 const config = require(`${process.cwd()}/botconfig/config.json`);
 const canvacord = require("canvacord");
 var ee = require(`${process.cwd()}/botconfig/embed.json`);
@@ -9,7 +9,7 @@ module.exports = {
   name: "stonks",
   aliases: [""],
   category: "🕹️ Fun",
-  description: "IMAGE CMD",
+  description: "Generate a stonks meme",
   usage: "stonks <TEXT>",
   type: "text",
   run: async (client, message, args, cmduser, text, prefix) => {
@@ -46,7 +46,7 @@ module.exports = {
         //send new Message
         message.reply({embeds : [tempmsg.embeds[0]
           .setAuthor(`Meme for: ${message.author.tag}`, message.author.displayAvatarURL())
-          .setColor(es.color)
+          .setColor(/^#([0-9A-F]{3}){1,2}$/i.test(es.color) ? es.color : "RED") // Validate color
           .setImage("attachment://stonks.png")
         ], files : [attachment]}).catch(() => {})
       })

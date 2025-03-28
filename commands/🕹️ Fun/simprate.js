@@ -1,12 +1,20 @@
+const { MessageEmbed } = require("discord.js");
 
-module.exports = async (client, interaction, args) => {
-    var result = Math.ceil(Math.random() * 100);
+module.exports = {
+  name: "simprate",
+  description: "Get a random simp rate",
+  category: "🕹️ Fun",
+  run: async (client, message) => {
+    const simprate = Math.floor(Math.random() * 101);
 
-    client.embed({
-        title: `👀・Simp rate`,
-        desc: `You are ${result}% simp!`,
-        type: 'editreply'
-    }, interaction)
-}
+    return message.reply({
+      embeds: [
+        new MessageEmbed()
+          .setColor("RANDOM")
+          .setTitle("💘 Simp Rate")
+          .setDescription(`You are ${simprate}% simp!`),
+      ],
+    });
+  },
+};
 
- 

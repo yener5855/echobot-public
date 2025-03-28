@@ -1,10 +1,62 @@
-const request = require('request'),
- Discord = require('discord.js'),
- CronJob = require('cron').CronJob,
- config = require(`../social_log/streamconfig.json`),
- fs = require('fs');
+const request = require('request');
+const Discord = require('discord.js');
+const fs = require('fs');
+const path = require('path');
 const { dbEnsure, delay } = require('../handlers/functions');
-const moment = require(`moment`)
+
+const configPath = path.resolve(__dirname, './streamconfig.json');
+const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+
+async function getStreamData(channelName) {
+  const clientID = process.env.TWITCH_CLIENT_ID || config.twitch_clientID;
+  const accessToken = process.env.TWITCH_AUTH_TOKEN || config.authToken;
+
+  return new Promise((resolve, reject) => {
+    const headers = {
+      'Client-ID': clientID,
+      'Authorization': `Bearer ${accessToken}`
+    };
+
+    request.get(
+      `https://api.twitch.tv/helix/streams?user_login=${channelName}`, { headers },
+      (error, res, body) => {
+        if (error) return reject(error);
+        try {
+          resolve(JSON.parse(body));
+        } catch (e) {
+          reject(e);
+        }
+      }
+    );
+  });
+}
+
+const { logTwitchEvent } = require(`${process.cwd()}/handlers/twitchLogger`);
+
+module.exports = async (client) => {
+  client.Joblivelog = new CronJob('0 */5 * * * *', async function () {
+    const guilds = await client.social_log.all().then(d => {
+      return d.filter(d => d?.data?.twitch?.channels?.length > 0 && d?.data?.twitch.channelId?.length > 1).map(v => v.data.twitch);
+    });
+
+    if (!guilds) return;
+
+    for (const guildData of guilds) {
+      const { channels, channelId } = guildData;
+
+      for (const twitchChannel of channels) {
+        try {
+          await logTwitchEvent(client, twitchChannel.ChannelName, channelId);
+        } catch (error) {
+          console.error(`Error logging Twitch event for ${twitchChannel.ChannelName}:`, error);
+        }
+      }
+    }
+  });
+
+  client.Joblivelog.start();
+};
+
 module.exports = async client => {
   //function that will run the checks
 
@@ -52,7 +104,7 @@ module.exports = async client => {
         let member = await guild.members.fetch(chan.DISCORD_USER_ID).catch(() => null);;
         if(!member) return //console.log(` [TWITCH] | ${moment().format("ddd DD-MM-YYYY HH:mm:ss.SSSS")} | ${guild.name} ::  MEMBER NOT FOUND!`.magenta)
         
-        let StreamData = await getStreamData(chan.ChannelName, process.env.twitch_clientID || config.twitch_clientID, config.authToken);
+        let StreamData = await getStreamData(chan.ChannelName);
         if(!StreamData) return //console.log(` [TWITCH] | ${moment().format("ddd DD-MM-YYYY HH:mm:ss.SSSS")} | ${guild.name} ::  No Stream Data`.magenta)
         if(!StreamData.data || StreamData.data.length == 0)  {
           if(tempData.roleID_GIVE && guild.roles.cache.has(tempData.roleID_GIVE) && member.roles.cache.has(tempData.roleID_GIVE))
@@ -109,30 +161,6 @@ module.exports = async client => {
     })
   }
 
-  async function getStreamData(channelName, clientID, authkey) {
-    return new Promise((resolve, reject) => {
-      var headers = {
-        'Client-Id': clientID,
-        'Authorization': `Bearer ${authkey}`
-      };
-      request.get(
-        `https://api.twitch.tv/helix/streams?user_login=${channelName}`, {
-          headers: headers
-        },
-        (error, res, body) => {
-          if (error) {
-            return console.error(error)
-          }
-          try {
-            resolve(JSON.parse(body))
-          } catch (e) {
-            reject(e)
-          }
-        }
-      )
-    });
-  }
-
   async function getChannelData(channelName, clientID, authkey) {
     return new Promise((resolve, reject) => {
       var headers = {
@@ -175,10 +203,14 @@ module.exports = async client => {
     });
   }
 
-  async function UpdateAuthConfig(){
+  async function UpdateAuthConfig() {
     let tempData = JSON.parse(fs.readFileSync('./social_log/streamconfig.json'));
-    const authKey = await getKey(process.env.twitch_clientID || tempData.twitch_clientID, process.env.twitch_secret || tempData.twitch_secret);
+    const clientID = process.env.TWITCH_CLIENT_ID || tempData.twitch_clientID;
+    const clientSecret = process.env.TWITCH_SECRET || tempData.twitch_secret;
+
+    const authKey = await getKey(clientID, clientSecret);
     if (!authKey) return console.log(`NO AUTH`);
+    
     var tempConfig = JSON.parse(fs.readFileSync('./social_log/streamconfig.json'));
     tempConfig.authToken = authKey;
     fs.writeFileSync('./social_log/streamconfig.json', JSON.stringify(tempConfig, null, 3));

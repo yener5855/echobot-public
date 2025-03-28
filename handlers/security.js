@@ -22,6 +22,7 @@ module.exports = (client) => {
     try {
       const guildId = channel.guild.id;
       simple_databasing(client, guildId); // Ensure databasing is handled
+      antinuke_databasing(channel.guild.id); // Call the function to initialize Anti-Nuke data
       if (config.security.channelCreate) {
         // Anti Channel Create
         await channel.delete();
@@ -238,5 +239,20 @@ module.exports = (client) => {
   function isSpam(message) {
     // Implement spam detection logic here
     return false;
+  }
+
+  // Define or import the antinuke_databasing function
+  function antinuke_databasing(guildId) {
+    // Ensure the Anti-Nuke system is initialized for the guild
+    if (!client.Anti_Nuke_System.has(guildId)) {
+      client.Anti_Nuke_System.set(guildId, {
+        antibot: [],
+        antichanneldelete: [],
+        antikick: [],
+        antideleteuser: [],
+        anticreaterole: [],
+        // Add other necessary properties here
+      });
+    }
   }
 };

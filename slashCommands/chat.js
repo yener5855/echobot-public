@@ -15,19 +15,18 @@ module.exports = {
 		{"String": { name: "chat_text", description: "Wanna Chat with me?", required: false }}, 
   ],
   run: async (client, interaction, cmduser, es, ls, prefix, player, message) => {
-    try{
-    //console.log(interaction, StringOption)
-		await interaction?.deferReply({ ephemeral: true })
-		//things u can directly access in an interaction!
-		const { member, channelId, guildId, applicationId, 
-		        commandName, deferred, replied, ephemeral, 
-				options, id, createdTimestamp 
-		} = interaction; 
-		const { guild } = member;
-		//let IntOption = options.getInteger("OPTIONNAME"); //same as in IntChoices //RETURNS NUMBER
-		const Text = options.getString("chat_text"); //same as in StringChoices //RETURNS STRING 
-		try {
+    try {
+        await interaction?.deferReply({ ephemeral: true });
+        const { options } = interaction;
+        const Text = options.getString("chat_text");
+
+        const startTime = Date.now();
+        const llmStart = Date.now();
+
+        try {
             const apiKey = process.env.GROQ_API_KEY || config.groq_api_key;
+            const queueStart = Date.now();
+
             const response = await fetch(`https://api.groq.com/v1/completions`, {
                 method: 'POST',
                 headers: {
@@ -36,7 +35,7 @@ module.exports = {
                 },
                 body: JSON.stringify({
                     messages: [{ role: "user", content: Text }],
-                    model: "llama-3.3-70b-versatile",
+                    model: "llama-3.2-3b-preview",
                     temperature: 1,
                     max_completion_tokens: 1024,
                     top_p: 1,
@@ -44,24 +43,30 @@ module.exports = {
                 })
             });
 
+            const queueEnd = Date.now();
             if (!response.body) {
                 return interaction?.editReply({ content: ":cry: **Sorry, I couldn't connect to GROQ_API!**", ephemeral: true });
             }
 
             const stream = Readable.from(response.body);
             let result = "";
-
             for await (const chunk of stream) {
                 result += chunk.toString();
             }
 
-            await interaction?.editReply({ content: result, ephemeral: true });
+            const apiEnd = Date.now();
+            const metrics = `${(llmStart - startTime).toFixed(3)}ms LLM - ${(queueEnd - queueStart).toFixed(3)}ms QUEUE - ${(apiEnd - queueEnd).toFixed(3)}ms API`;
+
+            await interaction?.editReply({
+                content: `**Response:**\n${result}\n\n**Metrics:** ${metrics}\n**Model:** llama-3.2-3b-preview`,
+                ephemeral: true
+            });
         } catch (e) {
             interaction?.editReply({ content: ":cry: **Sorry, I couldn't connect to GROQ_API!**", ephemeral: true });
             console.error("CHATBOT:", e);
         }
     } catch (e) {
-        console.log(String(e.stack).bgRed)
+        console.log(String(e.stack).bgRed);
     }
   }
 }

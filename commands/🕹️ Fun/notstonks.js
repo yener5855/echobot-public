@@ -1,5 +1,5 @@
 ﻿const Discord = require("discord.js");
-const {MessageEmbed, MessageAttachment} = require("discord.js");
+const { MessageEmbed, MessageAttachment } = require("discord.js");
 const config = require(`${process.cwd()}/botconfig/config.json`);
 const canvacord = require("canvacord");
 var ee = require(`${process.cwd()}/botconfig/embed.json`);
@@ -9,7 +9,7 @@ module.exports = {
   name: "notstonks",
   aliases: [""],
   category: "🕹️ Fun",
-  description: "IMAGE CMD",
+  description: "Generate a not stonks meme",
   usage: "notstonks <TEXT>",
   type: "text",
   run: async (client, message, args, cmduser, text, prefix) => {
@@ -45,7 +45,7 @@ module.exports = {
         tempmsg.delete();
         //send new Message
         message.reply({embeds : [tempmsg.embeds[0]
-          .setColor(es.color)
+          .setColor(/^#([0-9A-F]{3}){1,2}$/i.test(es.color) ? es.color : "RED") // Validate color
           .setAuthor(`Meme for: ${message.author.tag}`, message.author.displayAvatarURL())
           .setImage("attachment://notstonks.png")
         ], files : [attachment]}).catch(() => {})

@@ -1,13 +1,20 @@
 const axios = require('axios');
 const Discord = require('discord.js');
-const config = require(`${process.cwd()}/botconfig/config.json`);
+const fs = require('fs');
+const path = require('path');
+
+const configPath = path.resolve(__dirname, '../social_log/streamconfig.json');
+const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
 
 async function checkTwitchLive(client, channelName, discordChannelId) {
   try {
+    const clientID = process.env.TWITCH_CLIENT_ID || config.twitch_clientID;
+    const accessToken = process.env.TWITCH_AUTH_TOKEN || config.authToken;
+
     const response = await axios.get(`https://api.twitch.tv/helix/streams?user_login=${channelName}`, {
       headers: {
-        'Client-ID': config.twitchClientId,
-        'Authorization': `Bearer ${config.twitchAccessToken}`
+        'Client-ID': clientID,
+        'Authorization': `Bearer ${accessToken}`
       }
     });
 
@@ -18,8 +25,8 @@ async function checkTwitchLive(client, channelName, discordChannelId) {
         .setURL(`https://www.twitch.tv/${stream.user_name}`)
         .setDescription(stream.title)
         .setThumbnail(stream.thumbnail_url)
-        .addField('Game', stream.game_name, true)
-        .addField('Viewers', stream.viewer_count, true)
+        .addField('Game', stream.game_name || 'Unknown', true)
+        .addField('Viewers', stream.viewer_count.toString(), true)
         .setColor('PURPLE');
 
       const discordChannel = client.channels.cache.get(discordChannelId);
