@@ -535,6 +535,23 @@ module.exports = {
         await notemsg.edit({content: `***NOTE BUTTONS DISABLED***`,embeds: [embeds[currentPage]], components: allbuttons}).catch(e=>{console.log(String(e).grey)});
       }
     });
+
+    try {
+      const memoryUsage = process.memoryUsage();
+      const formattedMemory = Object.entries(memoryUsage)
+        .map(([key, value]) => `${key}: ${(value / 1024 / 1024).toFixed(2)} MB`)
+        .join("\n");
+
+      return message.reply({
+        embeds: [new MessageEmbed()
+          .setTitle("Memory Usage")
+          .setDescription(`\`\`\`\n${formattedMemory}\n\`\`\``)
+          .setColor(es.color)]
+      });
+    } catch (e) {
+      console.log(String(e).grey);
+    }
+
     } catch (e) {
       console.log(String(e.stack).grey.bgRed)
       return message.reply({embeds: [new MessageEmbed()

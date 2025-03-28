@@ -1,57 +1,57 @@
-const Discord = require("discord.js");
-const {MessageEmbed} = require("discord.js");
-const config = require(`${process.cwd()}/botconfig/config.json`)
-var ee = require(`${process.cwd()}/botconfig/embed.json`)
-const emoji = require(`${process.cwd()}/botconfig/emojis.json`);
-const moment = require("moment")
-const { handlemsg } = require(`${process.cwd()}/handlers/functions`)
+const { MessageEmbed } = require("discord.js");
+
 module.exports = {
   name: "membercount",
-  aliases: ["members"],
+  description: "Sets up live-updating member count channels.",
   category: "🔰 Info",
-  description: "Shows how many Members there are in this Server",
   usage: "membercount",
-  type: "server",
-  run: async (client, message, args, cmduser, text, prefix) => {
-    
-    let es = client.settings.get(message.guild.id, "embed");let ls = client.settings.get(message.guild.id, "language")
+  run: async (client, message) => {
     try {
-      await message.guild.members.fetch().catch(() => {});
-      
-        message.reply({embeds: [new Discord.MessageEmbed()
-        .setAuthor(client.la[ls].cmds.info.membercount.title + " " +message.guild.name, message.guild.iconURL({
-          dynamic: true
-        }), "https://discord.com/invite/Yfb2fnkduE")
-        .setColor(es.color)
-        .addField(client.la[ls].cmds.info.membercount.field1, "😀 \`" + message.guild.memberCount + "\`", true)
-        .addField(client.la[ls].cmds.info.membercount.field2, "👤 \`" + message.guild.members.cache.filter(member => !member.user.bot).size + "\`", true)
-        .addField(client.la[ls].cmds.info.membercount.field3, "🤖 \`" + message.guild.members.cache.filter(member => member.user.bot).size + "\`", true)
-        
-        .addField(client.la[ls].cmds.info.membercount.field4, "🟢 \`" + message.guild.members.cache.filter(member => member.presence && member.presence && member.presence.status != "offline").size + "\`", true)
-        .addField(client.la[ls].cmds.info.membercount.field4, "🟢 \`" + message.guild.members.cache.filter(member => !member.user.bot && member.presence && member.presence && member.presence.status != "offline").size + "\`", true)
-        .addField(client.la[ls].cmds.info.membercount.field4, "🟢 \`" + message.guild.members.cache.filter(member => member.user.bot && member.presence && member.presence && member.presence.status != "offline").size + "\`", true)
-        
-        .addField(client.la[ls].cmds.info.membercount.field5, "🟠 \`" + message.guild.members.cache.filter(member => member.presence && member.presence && member.presence.status == "idle").size + "\`", true)
-        .addField(client.la[ls].cmds.info.membercount.field5, "🟠 \`" + message.guild.members.cache.filter(member => !member.user.bot && member.presence && member.presence && member.presence.status == "idle").size + "\`", true)
-        .addField(client.la[ls].cmds.info.membercount.field5, "🟠 \`" + message.guild.members.cache.filter(member => member.user.bot && member.presence && member.presence && member.presence.status == "idle").size + "\`", true)
-        
-        .addField(client.la[ls].cmds.info.membercount.field6, "🔴 \`" + message.guild.members.cache.filter(member => member.presence && member.presence && member.presence.status == "dnd").size + "\`", true)
-        .addField(client.la[ls].cmds.info.membercount.field6, "🔴 \`" + message.guild.members.cache.filter(member => !member.user.bot && member.presence && member.presence && member.presence.status == "dnd").size + "\`", true)
-        .addField(client.la[ls].cmds.info.membercount.field6, "🔴 \`" + message.guild.members.cache.filter(member => member.user.bot && member.presence && member.presence && member.presence.status == "dnd").size + "\`", true)
-        
-        .addField(client.la[ls].cmds.info.membercount.field7, ":black_circle:\`" + message.guild.members.cache.filter(member => !member.presence || member.presence && member.presence.status == "offline").size + "\`", true)
-        .addField(client.la[ls].cmds.info.membercount.field7, ":black_circle:\`" + message.guild.members.cache.filter(member => !member.user.bot && (!member.presence || member.presence && member.presence.status == "offline")).size + "\`", true)
-        .addField(client.la[ls].cmds.info.membercount.field7, ":black_circle:\`" + message.guild.members.cache.filter(member => member.user.bot && (!member.presence || member.presence && member.presence.status == "offline")).size + "\`", true)
-        .setTimestamp()
-      ]});
-    } catch (e) {
-      console.log(String(e.stack).grey.bgRed)
-      return message.reply({embeds: [new MessageEmbed()
-        .setColor(es.wrongcolor)
-        .setFooter(client.getFooter(es))
-        .setTitle(client.la[ls].common.erroroccur)
-        .setDescription(eval(client.la[ls]["cmds"]["info"]["color"]["variable2"]))
-      ]});
+      // Ensure the bot has the necessary permissions
+      if (!message.guild.me.permissions.has("MANAGE_CHANNELS")) {
+        return message.reply("I need the `Manage Channels` permission to set up member count channels.");
+      }
+
+      // Create or fetch the channels
+      const totalChannel = await message.guild.channels.create("Total Members: 0", { type: "GUILD_VOICE", permissionOverwrites: [{ id: message.guild.id, deny: ["CONNECT"] }] });
+      const humansChannel = await message.guild.channels.create("Humans: 0", { type: "GUILD_VOICE", permissionOverwrites: [{ id: message.guild.id, deny: ["CONNECT"] }] });
+      const botsChannel = await message.guild.channels.create("Bots: 0", { type: "GUILD_VOICE", permissionOverwrites: [{ id: message.guild.id, deny: ["CONNECT"] }] });
+
+      // Save the channel IDs in the bot's settings
+      client.settings.set(message.guild.id, {
+        totalChannelId: totalChannel.id,
+        humansChannelId: humansChannel.id,
+        botsChannelId: botsChannel.id,
+      }, "memberCountChannels");
+
+      // Update the channels immediately
+      updateMemberCountChannels(client, message.guild);
+
+      message.reply("Member count channels have been set up and will update automatically!");
+    } catch (error) {
+      console.error(error);
+      message.reply("An error occurred while setting up the member count channels.");
     }
+  },
+};
+
+async function updateMemberCountChannels(client, guild) {
+  try {
+    const settings = client.settings.get(guild.id, "memberCountChannels");
+    if (!settings) return;
+
+    const totalMembers = guild.memberCount;
+    const humanMembers = guild.members.cache.filter(member => !member.user.bot).size;
+    const botMembers = guild.members.cache.filter(member => member.user.bot).size;
+
+    const totalChannel = guild.channels.cache.get(settings.totalChannelId);
+    const humansChannel = guild.channels.cache.get(settings.humansChannelId);
+    const botsChannel = guild.channels.cache.get(settings.botsChannelId);
+
+    if (totalChannel) await totalChannel.setName(`Total Members: ${totalMembers}`);
+    if (humansChannel) await humansChannel.setName(`Humans: ${humanMembers}`);
+    if (botsChannel) await botsChannel.setName(`Bots: ${botMembers}`);
+  } catch (error) {
+    console.error(`Failed to update member count channels for guild ${guild.id}:`, error);
   }
 }

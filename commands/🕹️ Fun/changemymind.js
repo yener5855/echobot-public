@@ -1,55 +1,57 @@
-﻿const Discord = require("discord.js");
-const {MessageEmbed, MessageAttachment} = require("discord.js");
-const config = require(`${process.cwd()}/botconfig/config.json`);
+﻿const { MessageEmbed, MessageAttachment } = require("discord.js");
 const canvacord = require("canvacord");
-var ee = require(`${process.cwd()}/botconfig/embed.json`);
-const request = require("request");
-const emoji = require(`${process.cwd()}/botconfig/emojis.json`);
+
 module.exports = {
   name: "changemymind",
-  aliases: [""],
+  description: "Generate a 'Change My Mind' meme with custom text",
+  usage: "changemymind <text>",
   category: "🕹️ Fun",
-  description: "IMAGE CMD",
-  usage: "changemymind <TEXT>",
-  type: "text",
-  run: async (client, message, args, cmduser, text, prefix) => {
-    
-    let es = client.settings.get(message.guild.id, "embed");let ls = client.settings.get(message.guild.id, "language")
-        if(!client.settings.get(message.guild.id, "FUN")){
-          return message.reply({embeds : [new MessageEmbed()
-            .setColor(es.wrongcolor)
-            .setFooter(client.getFooter(es))
-            .setTitle(client.la[ls].common.disabled.title)
-            .setDescription(require(`${process.cwd()}/handlers/functions`).handlemsg(client.la[ls].common.disabled.description, {prefix: prefix}))
-          ]});
-        }
-      //send loading message
-      var tempmsg = await message.reply({embeds : [new MessageEmbed()
-        .setColor(ee.color)
-        .setAuthor( 'Getting Image Data..', 'https://images-ext-1.discordapp.net/external/ANU162U1fDdmQhim_BcbQ3lf4dLaIQl7p0HcqzD5wJA/https/cdn.discordapp.com/emojis/756773010123522058.gif')
-      ]});
-      //get the additional text
-      var text = args.join(" ");
-      //If no text added, return error
-      if(!text) return tempmsg.edit({embeds : [tempmsg.embeds[0]
-        .setTitle(eval(client.la[ls]["cmds"]["fun"]["changemymind"]["variable2"]))
-        .setColor("RED")
-        .setDescription(eval(client.la[ls]["cmds"]["fun"]["changemymind"]["variable3"]))
-      ]}).catch(() => {})
-      
-      //get the memer image
-      client.memer.changemymind(text).then(image => {
-        //make an attachment
-        var attachment = new MessageAttachment(image, "changemymind.png");
-        //delete old message
-        tempmsg.delete();
-        //send new Message
-        message.reply({embeds : [tempmsg.embeds[0]
-          .setAuthor(`Meme for: ${message.author.tag}`, message.author.displayAvatarURL())
-          .setColor(es.color)          
-          .setImage("attachment://changemymind.png") 
-        ], files : [attachment]}).catch(() => {})
-      })
-      
-  }
-}
+  run: async (client, message, args) => {
+    const text = args.join(" ");
+    if (!text) {
+      return message.reply({
+        embeds: [
+          new MessageEmbed()
+            .setColor("RED")
+            .setTitle("❌ Please provide text for the meme!")
+            .setFooter("Usage: changemymind <text>"),
+        ],
+      });
+    }
+
+    const loadingMessage = await message.reply({
+      embeds: [
+        new MessageEmbed()
+          .setColor("BLUE")
+          .setTitle("🖼️ Generating your meme...")
+          .setFooter("Please wait a moment..."),
+      ],
+    });
+
+    try {
+      const meme = await canvacord.Canvas.changemymind(text);
+      const attachment = new MessageAttachment(meme, "changemymind.png");
+
+      await loadingMessage.delete();
+      return message.reply({
+        files: [attachment],
+        embeds: [
+          new MessageEmbed()
+            .setColor("GREEN")
+            .setTitle("🎉 Here's your meme!")
+            .setImage("attachment://changemymind.png"),
+        ],
+      });
+    } catch (error) {
+      console.error(error);
+      return loadingMessage.edit({
+        embeds: [
+          new MessageEmbed()
+            .setColor("RED")
+            .setTitle("❌ Failed to generate the meme!")
+            .setFooter("Please try again later."),
+        ],
+      });
+    }
+  },
+};

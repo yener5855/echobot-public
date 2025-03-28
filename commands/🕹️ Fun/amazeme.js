@@ -17,41 +17,29 @@ const subreddits = [
   "funny"
 ];
 const path = require("path");
+const axios = require("axios");
+
 module.exports = {
-  name: path.parse(__filename).name,
+  name: "amazeme",
+  description: "Get an amazing image",
   category: "🕹️ Fun",
-  usage: `${path.parse(__filename).name}`,
-  description: "Random Meme",
-  type: "text",
-  run: async (client, message, args, cmduser, text, prefix) => {
-    
-    let es = client.settings.get(message.guild.id, "embed");let ls = client.settings.get(message.guild.id, "language")
-        if(!client.settings.get(message.guild.id, "FUN")){
-          return message.reply({embeds : [new MessageEmbed()
-            .setColor(es.wrongcolor)
-            .setFooter(client.getFooter(es))
-            .setTitle(client.la[ls].common.disabled.title)
-            .setDescription(require(`${process.cwd()}/handlers/functions`).handlemsg(client.la[ls].common.disabled.description, {prefix: prefix}))
-          ]});
-        }
+  run: async (client, message) => {
     try {
-      const data = await fetch(`https://imgur.com/r/${subreddits[Math.floor(Math.random() * subreddits.length)]}/hot.json`)
-        .then(response => response.json())
-        .then(body => body.data);
-      let selected = data[Math.floor(Math.random() * data.length)];
-      if(!selected) selected = data[Math.floor(Math.random() * data.length)];
-      if(!selected) selected = data[Math.floor(Math.random() * data.length)];
-      if(!selected) selected = data[Math.floor(Math.random() * data.length)];
-      if(!selected) return message.reply(":x: **No Meme found, please retry!**")
-      return message.reply({content : eval(client.la[ls]["cmds"]["fun"]["meme"]["variable1"])});
-    } catch (e) {
-      console.log(String(e.stack).grey.bgRed)
-      return message.reply({embeds : [new MessageEmbed()
-        .setColor(es.wrongcolor)
-        .setFooter(client.getFooter(es))
-        .setTitle(client.la[ls].common.erroroccur)
-        .setDescription(eval(client.la[ls]["cmds"]["fun"]["amazeme"]["variable2"]))
-      ]});
+      const response = await axios.get("https://www.reddit.com/r/interestingasfuck/random/.json");
+      const post = response.data[0].data.children[0].data;
+
+      return message.reply({
+        embeds: [
+          new MessageEmbed()
+            .setColor("RANDOM")
+            .setTitle(post.title)
+            .setImage(post.url)
+            .setFooter("Source: r/interestingasfuck"),
+        ],
+      });
+    } catch (error) {
+      console.error(error);
+      return message.reply("❌ Failed to fetch an amazing image. Please try again later.");
     }
-  }
-}
+  },
+};

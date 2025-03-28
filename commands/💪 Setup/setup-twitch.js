@@ -9,6 +9,8 @@ var {
   databasing
 } = require(`${process.cwd()}/handlers/functions`);
 const { MessageButton, MessageActionRow, MessageSelectMenu } = require('discord.js')
+const { logTwitchEvent } = require(`${process.cwd()}/handlers/twitchLogger`);
+
 module.exports = {
   name: "setup-twitch",
   category: "💪 Setup",
@@ -258,6 +260,12 @@ module.exports = {
                             var msg = collected.first().content;
                             if(msg){
                               var themsg = msg;
+                              const channelId = client.social_log.get(message.guild.id, "twitch.channelId");
+                              const discordChannel = message.guild.channels.cache.get(channelId);
+
+                              if (!discordChannel) 
+                                return message.reply(":x: **The Discord channel for Twitch notifications is not set or invalid.**");
+
                               client.social_log.push(message.guild.id,
                                 {
                                   ChannelName: channelname,
@@ -266,9 +274,12 @@ module.exports = {
                                   message: themsg
                                 }, "twitch.channels")
                               
+                              // Log the Twitch event
+                              logTwitchEvent(client, channelname, discordChannel.id);
+
                               return message.reply({embeds: [new Discord.MessageEmbed()
-                                .setTitle(eval(client.la[ls]["cmds"]["setup"]["setup-twitch"]["variable11"]))
-                                .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup-twitch"]["variable12"]))
+                                .setTitle("Twitch Channel Added!")
+                                .setDescription(`Successfully added Twitch channel: ${channelname}`)
                                 .setColor(es.color)
                                 .setFooter(client.getFooter(es))
                               ]});

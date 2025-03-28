@@ -48,7 +48,7 @@ module.exports = {
             {
               value: "setup-antidiscord",
               description: `Setup a Anit-DISCORD System to prevent DC-LINKS`,
-              emoji: "⚙️"
+              emoji: "787321652345438228"
             },
             {
               value: "setup-antilink",
@@ -58,7 +58,7 @@ module.exports = {
             {
               value: "setup-antinuke",
               description: `Setup a Anit-NUKE System to prevent NUKES`,
-              emoji: "⚙️"
+              emoji: "866089515993792522"
             },
             {
               value: "setup-apply",
@@ -78,7 +78,7 @@ module.exports = {
             {
               value: "setup-automeme",
               description: `Define a Channel to post MEMES every Minute`,
-              emoji: "⚙️"
+              emoji: "862749865460498524"
             },
             {
               value: "setup-autonsfw",
@@ -188,22 +188,22 @@ module.exports = {
             {
               value: "setup-tiktok",
               description: `Setup up to 3 different TikTok Logger Channels`,
-              emoji: "⚙️"
+              emoji: "840503976315060225"
             },
             {
               value: "setup-twitch",
               description: `Setup up to 5 different Twitch Logger Channels`,
-              emoji: "⚙️"
+              emoji: "840260133753061408"
             },
             {
               value: "setup-twitter",
               description: `Setup up to 2 different Twitter Logger Channels`,
-              emoji: "⚙️"
+              emoji: "840255600851812393"
             },
             {
               value: "setup-validcode",
               description: `Setup the Valid-Code System`,
-              emoji: "⚙️"
+              emoji: "858405056238714930"
             },
             {
               value: "setup-warn",
@@ -219,11 +219,6 @@ module.exports = {
               value: "setup-youtube",
               description: `Setup up to 5 different Youtube Logger Channels`,
               emoji: "🚫"
-            },
-            {
-              value: "setup-birthday",
-              description: `Setup the Birthday System`,
-              emoji: "🎂"
             },
           ]
           let Selection1 = new MessageSelectMenu()
@@ -276,19 +271,19 @@ module.exports = {
             .setColor(es.color)
             .setAuthor("Setup-Systems | (1/3) [A-C]", 
             "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/lg/57/gear_2699.png",
-            "https://discord.com/invite/Yfb2fnkduE")
+            "https://discord.gg/milrato")
             .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup"]["variable1"]))
           let MenuEmbed2 = new Discord.MessageEmbed()
             .setColor(es.color)
             .setAuthor("Setup-Systems | (2/3) [C-R]", 
             "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/lg/57/gear_2699.png",
-            "https://discord.com/invite/Yfb2fnkduE")
+            "https://discord.gg/milrato")
             .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup"]["variable2"]))
           let MenuEmbed3 = new Discord.MessageEmbed()
             .setColor(es.color)
             .setAuthor("Setup-Systems | (3/3) [R-Z]", 
             "https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/120/lg/57/gear_2699.png",
-            "https://discord.com/invite/Yfb2fnkduE")
+            "https://discord.gg/milrato")
             .setDescription(eval(client.la[ls]["cmds"]["setup"]["setup"]["variable3"]))
           //send the menu msg
           let menumsg1 = await message.reply({embeds: [MenuEmbed1], components: [new MessageActionRow().addComponents(Selection1)]})
@@ -308,128 +303,27 @@ module.exports = {
                 menumsg1.edit({components: [], embeds: menumsg1.embeds}).catch(() => {});
                 menuselection(menu);
               }
-              else menu?.reply({content: `<:no:1269533999014084683> You are not allowed to do that! Only: <@${cmduser.id}>`, ephemeral: true});
+              else menu?.reply({content: `<:no:833101993668771842> You are not allowed to do that! Only: <@${cmduser.id}>`, ephemeral: true});
             }
             if (menu?.message.id === menumsg2.id) {
               if (menu?.user.id === cmduser.id) {
                 menumsg2.edit({components: [], embeds: menumsg2.embeds}).catch(() => {});
                 menuselection(menu);
               }
-              else menu?.reply({content: `<:no:1269533999014084683> You are not allowed to do that! Only: <@${cmduser.id}>`, ephemeral: true});
+              else menu?.reply({content: `<:no:833101993668771842> You are not allowed to do that! Only: <@${cmduser.id}>`, ephemeral: true});
             }
             if (menu?.message.id === menumsg3.id) {
               if (menu?.user.id === cmduser.id) {
                 menumsg3.edit({components: [], embeds: menumsg3.embeds}).catch(() => {});
                 menuselection(menu);
               }
-              else menu?.reply({content: `<:no:1269533999014084683> You are not allowed to do that! Only: <@${cmduser.id}>`, ephemeral: true});
+              else menu?.reply({content: `<:no:833101993668771842> You are not allowed to do that! Only: <@${cmduser.id}>`, ephemeral: true});
             }
           });
         }
 
         async function handle_the_picks(menuoptionindex, menuoptiondata) {
-          if (menuoptiondata.value.toLowerCase() === "setup-jtc") {
-            await setupJoinToCreate(client, message, args, cmduser, text, prefix);
-          } else {
-            require(`./${menuoptiondata.value.toLowerCase()}`).run(client, message, args, cmduser, text, prefix);
-          }
-        }
-
-        async function selectVoiceChannel(message) {
-          const voiceChannels = message.guild.channels.cache.filter(c => c.type === "GUILD_VOICE");
-          if (!voiceChannels.size) {
-            return message.channel.send({ embeds: [new MessageEmbed()
-              .setColor("#ff0000")
-              .setTitle("No Voice Channels Found")
-              .setDescription("There are no voice channels in this server.")
-            ]});
-          }
-        
-          const limitedChannels = voiceChannels.first(10); // Limit to the first 10 channels
-          const embed = new MessageEmbed()
-            .setColor("#00ff00")
-            .setTitle("Select a Voice Channel")
-            .setDescription(
-              limitedChannels.map((vc, index) => `${index + 1}. ${vc.name}`).join("\n") +
-              "\n\nPlease type the number of the voice channel you want to select."
-            )
-            .setFooter("You have 60 seconds to respond.");
-        
-          await message.channel.send({ embeds: [embed] });
-        
-          const filter = m => m.author.id === message.author.id && !isNaN(m.content) && m.content > 0 && m.content <= limitedChannels.length;
-          const collected = await message.channel.awaitMessages({ filter, max: 1, time: 60000, errors: ["time"] }).catch(() => null);
-        
-          if (!collected) {
-            return message.channel.send({ embeds: [new MessageEmbed()
-              .setColor("#ff0000")
-              .setTitle("Time Expired")
-              .setDescription("You did not select a voice channel in time.")
-            ]});
-          }
-        
-          const selectedChannel = limitedChannels[Number(collected.first().content) - 1];
-          return selectedChannel;
-        }
-
-        async function setupJoinToCreate(client, message, args, cmduser, text, prefix) {
-          try {
-            const embedInstruction = new MessageEmbed()
-              .setColor("#00ff00")
-              .setTitle("Join-To-Create Setup")
-              .setDescription(
-                "Please choose an option:\n\n" +
-                "1️⃣ Select an existing voice channel.\n" +
-                "2️⃣ Let the bot create a new voice channel for Join-To-Create."
-              )
-              .setFooter("React with 1️⃣ or 2️⃣ to proceed.");
-        
-            const instructionMessage = await message.channel.send({ embeds: [embedInstruction] });
-            await instructionMessage.react("1️⃣");
-            await instructionMessage.react("2️⃣");
-        
-            const filter = (reaction, user) => {
-              return ["1️⃣", "2️⃣"].includes(reaction.emoji.name) && user.id === message.author.id;
-            };
-        
-            const collected = await instructionMessage.awaitReactions({ filter, max: 1, time: 60000, errors: ["time"] });
-            const reaction = collected.first();
-        
-            if (reaction.emoji.name === "1️⃣") {
-              // Option 1: Select an existing voice channel
-              const selectedChannel = await selectVoiceChannel(message);
-              if (!selectedChannel) return;
-        
-              client.settings.set(message.guild.id, selectedChannel.id, "jtcChannel");
-        
-              const embedSuccess = new MessageEmbed()
-                .setColor("#00ff00")
-                .setTitle("Join-To-Create Setup Complete")
-                .setDescription(`Join-To-Create has been successfully set up for the channel: **${selectedChannel.name}**`)
-                .setFooter("Setup successful.");
-              await message.channel.send({ embeds: [embedSuccess] });
-        
-            } else if (reaction.emoji.name === "2️⃣") {
-              // Option 2: Let the bot create a new voice channel
-              const newChannel = await message.guild.channels.create("Join-To-Create", { type: "GUILD_VOICE" });
-              client.settings.set(message.guild.id, newChannel.id, "jtcChannel");
-        
-              const embedSuccess = new MessageEmbed()
-                .setColor("#00ff00")
-                .setTitle("Join-To-Create Setup Complete")
-                .setDescription(`A new voice channel named **${newChannel.name}** has been created and set up for Join-To-Create.`)
-                .setFooter("Setup successful.");
-              await message.channel.send({ embeds: [embedSuccess] });
-            }
-          } catch (error) {
-            console.error(error);
-            const embedError = new MessageEmbed()
-              .setColor("#ff0000")
-              .setTitle("Setup Error")
-              .setDescription("An error occurred while setting up Join-To-Create. Please try again.")
-              .setFooter("Setup failed.");
-            message.channel.send({ embeds: [embedError] });
-          }
+          require(`./${menuoptiondata.value.toLowerCase()}`).run(client, message, args, cmduser, text, prefix);
         }
       } catch (e) {
       console.log(String(e.stack).grey.bgRed)
@@ -441,3 +335,12 @@ module.exports = {
     }
   },
 };
+/**
+ * @INFO
+ * Bot Coded by Tomato#6966 | https://discord.gg/milrato
+ * @INFO
+ * Work for Milrato Development | https://milrato.eu
+ * @INFO
+ * Please mention him / Milrato Development, when using this Code!
+ * @INFO
+ */

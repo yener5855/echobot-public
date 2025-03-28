@@ -6,8 +6,8 @@ module.exports = {
       instances: '1', // Dynamisch aantal instanties gebaseerd op CPU's
       exec_mode: 'cluster', // Cluster mode voor load balancing
       watch: true,
-      ignore_watch: ['.git', 'node_modules', 'logs', "databases","social_log"], // Voorkomen dat deze paden worden gevolgd
-      max_memory_restart: '500M', // Herstart als geheugenlimiet wordt bereikt
+      ignore_watch: ['.git', 'node_modules', 'logs', "databases","social_log","example_copy.txt"], // Voorkomen dat deze paden worden gevolgd
+      max_memory_restart: '6G', // Herstart als geheugenlimiet wordt bereikt
       env: {
         NODE_ENV: 'development',
         PORT: 3000,
